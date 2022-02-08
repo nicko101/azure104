@@ -10,8 +10,8 @@
             "defaultValue": "frontendSERVER",
             "type": "String"
         },
-        "virtualNetworks_BeardSite_vnet_name": {
-            "defaultValue": "BeardSite-vnet",
+        "virtualNetworks_NickSite_vnet_name": {
+            "defaultValue": "NickSite-vnet",
             "type": "String"
         },
         "networkInterfaces_backendserver889_name": {
@@ -197,7 +197,7 @@
         {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2019-07-01",
-            "name": "[parameters('virtualNetworks_BeardSite_vnet_name')]",
+            "name": "[parameters('virtualNetworks_NickSite_vnet_name')]",
             "location": "[resourceGroup().location]",
             "tags": {
                 "NicksNetwork": "[resourceGroup().location]"
