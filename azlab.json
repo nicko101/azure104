@@ -42,9 +42,7 @@
                         "createOption": "FromImage",
                         "caching": "ReadWrite",
                         "managedDisk": {
-                            "storageAccountType": "StandardSSD_LRS",
-                            "id": "[parameters('disks_DC01_disk1_a017883f296c497488f2de9ae49a8337_externalid')]"
-                        },
+                            "storageAccountType": "StandardSSD_LRS"},
                         "deleteOption": "Delete",
                         "diskSizeGB": 127
                     },
