@@ -79,7 +79,7 @@
             "name": "[parameters('networkSecurityGroups_frontendSERVER_nsg_name')]",
             "location": "[resourceGroup().location]",
             "tags": {
-                "NicksNetwork": "[resourceGroup().location]"
+                "NicksNetwork-updated": "[resourceGroup().location]"
             },
             "properties": {
                 "securityRules": [
@@ -200,7 +200,7 @@
             "name": "[parameters('virtualNetworks_NickSite_vnet_name')]",
             "location": "[resourceGroup().location]",
             "tags": {
-                "NicksNetwork": "[resourceGroup().location]"
+                "NicksNetwork-updated": "[resourceGroup().location]"
             },
             "properties": {
                 "addressSpace": {
@@ -233,7 +233,7 @@
                 "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_backendserver889_name'))]"
             ],
             "tags": {
-                "NicksNetwork": "[resourceGroup().location]"
+                "NicksNetwork-updated": "[resourceGroup().location]"
             },
             "properties": {
                 "hardwareProfile": {
@@ -287,7 +287,7 @@
                 "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_frontendserver859_name'))]"
             ],
             "tags": {
-                "NicksNetwork": "[resourceGroup().location]"
+                "NicksNetwork-updated": "[resourceGroup().location]"
             },
             "properties": {
                 "hardwareProfile": {
@@ -486,7 +486,7 @@
                 "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_frontendSERVER_nsg_name'))]"
             ],
             "tags": {
-                "NicksNetwork": "[resourceGroup().location]"
+                "NicksNetwork-updated": "[resourceGroup().location]"
             },
             "properties": {
                 "ipConfigurations": [
