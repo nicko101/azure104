@@ -53,7 +53,6 @@
                         "caching": "ReadWrite",
                         "managedDisk": {
                             "storageAccountType": "Standard_LRS",
-                            "id": "[parameters('disks_netsecfw01_OsDisk_1_98eddfaf76df4f52944fa1b12ad8fc28_externalid')]"
                         },
                         "deleteOption": "Detach",
                         "diskSizeGB": 60
