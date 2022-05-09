@@ -1,17 +1,17 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.5",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
     "parameters": {
         "virtualMachines_backendSERVER_name": {
             "defaultValue": "backendSERVER",
             "type": "String"
         },
-        "virtualMachines_frontendSERVER_name": {
-            "defaultValue": "frontendSERVER",
-            "type": "String"
-        },
         "virtualNetworks_NickSite_vnet_name": {
             "defaultValue": "NickSite-vnet",
+            "type": "String"
+        },
+        "virtualMachines_frontendSERVER_name": {
+            "defaultValue": "frontendSERVER",
             "type": "String"
         },
         "networkInterfaces_backendserver889_name": {
@@ -39,17 +39,15 @@
             "type": "String"
         }
     },
-    "variables": {
-        "tags": "NicksNetwork-updated"
-    },
+    "variables": {},
     "resources": [
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2020-11-01",
             "name": "[parameters('networkSecurityGroups_backendSERVER_nsg_name')]",
-            "location": "[resourceGroup().location]",
+            "location": "westeurope",
             "tags": {
-                "NicksNetwork": "[resourceGroup().location]"
+                "NicksNetwork": "westeurope"
             },
             "properties": {
                 "securityRules": [
@@ -75,11 +73,11 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2020-11-01",
             "name": "[parameters('networkSecurityGroups_frontendSERVER_nsg_name')]",
-            "location": "[resourceGroup().location]",
+            "location": "westeurope",
             "tags": {
-                "NicksNetwork-updated": "[resourceGroup().location]"
+                "NicksNetwork-updated": "westeurope"
             },
             "properties": {
                 "securityRules": [
@@ -132,7 +130,7 @@
                             "destinationPortRanges": [],
                             "sourceAddressPrefixes": [],
                             "destinationAddressPrefixes": []
-                        }  
+                        }
                     },
                     {
                         "name": "RDP",
@@ -149,25 +147,24 @@
                             "destinationPortRanges": [],
                             "sourceAddressPrefixes": [],
                             "destinationAddressPrefixes": []
-                        }  
+                        }
                     }
                 ]
             }
         },
         {
             "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2020-11-01",
             "name": "[parameters('publicIPAddresses_backendSERVER_ip_name')]",
-            "location": "[resourceGroup().location]",
+            "location": "westeurope",
             "tags": {
-                "NicksNetwork": "[resourceGroup().location]"
+                "NicksNetwork": "westeurope"
             },
             "sku": {
                 "name": "Basic",
                 "tier": "Regional"
             },
             "properties": {
-                "ipAddress": "13.84.179.180",
                 "publicIPAddressVersion": "IPv4",
                 "publicIPAllocationMethod": "Dynamic",
                 "idleTimeoutInMinutes": 4,
@@ -176,18 +173,17 @@
         },
         {
             "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2020-11-01",
             "name": "[parameters('publicIPAddresses_frontendSERVER_ip_name')]",
-            "location": "[resourceGroup().location]",
+            "location": "westeurope",
             "tags": {
-                "NicksNetwork": "[resourceGroup().location]"
+                "NicksNetwork": "westeurope"
             },
             "sku": {
                 "name": "Basic",
                 "tier": "Regional"
             },
             "properties": {
-                "ipAddress": "13.84.179.192",
                 "publicIPAddressVersion": "IPv4",
                 "publicIPAllocationMethod": "Dynamic",
                 "idleTimeoutInMinutes": 4,
@@ -196,11 +192,11 @@
         },
         {
             "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2020-11-01",
             "name": "[parameters('virtualNetworks_NickSite_vnet_name')]",
-            "location": "[resourceGroup().location]",
+            "location": "westeurope",
             "tags": {
-                "NicksNetwork-updated": "[resourceGroup().location]"
+                "NicksNetwork-updated": "westeurope"
             },
             "properties": {
                 "addressSpace": {
@@ -220,24 +216,23 @@
                     }
                 ],
                 "virtualNetworkPeerings": [],
-                "enableDdosProtection": false,
-                "enableVmProtection": false
+                "enableDdosProtection": false
             }
         },
         {
             "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2019-03-01",
+            "apiVersion": "2021-11-01",
             "name": "[parameters('virtualMachines_backendSERVER_name')]",
-            "location": "[resourceGroup().location]",
+            "location": "westeurope",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_backendserver889_name'))]"
             ],
             "tags": {
-                "NicksNetwork-updated": "[resourceGroup().location]"
+                "NicksNetwork-updated": "westeurope"
             },
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "Standard_B1s"
+                    "vmSize": "Standard_DS1_v2"
                 },
                 "storageProfile": {
                     "imageReference": {
@@ -252,22 +247,26 @@
                         "createOption": "FromImage",
                         "caching": "ReadWrite",
                         "managedDisk": {
-                            "storageAccountType": "Standard_LRS"
+                            "id": "[resourceId('Microsoft.Compute/disks', concat(parameters('virtualMachines_backendSERVER_name'), '_OsDisk_1_ef3ab3c577ea4dd5827852baae056008'))]"
                         },
-                        "diskSizeGB": 127
+                        "deleteOption": "Detach"
                     },
                     "dataDisks": []
                 },
                 "osProfile": {
                     "computerName": "[parameters('virtualMachines_backendSERVER_name')]",
                     "adminUsername": "nickadmin",
-                    "adminPassword": "mM%Vc!562yTj",
                     "windowsConfiguration": {
                         "provisionVMAgent": true,
-                        "enableAutomaticUpdates": true
+                        "enableAutomaticUpdates": true,
+                        "patchSettings": {
+                            "patchMode": "AutomaticByOS",
+                            "assessmentMode": "ImageDefault"
+                        }
                     },
                     "secrets": [],
-                    "allowExtensionOperations": true
+                    "allowExtensionOperations": true,
+                    "requireGuestProvisionSignal": true
                 },
                 "networkProfile": {
                     "networkInterfaces": [
@@ -280,14 +279,14 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2019-03-01",
+            "apiVersion": "2021-11-01",
             "name": "[parameters('virtualMachines_frontendSERVER_name')]",
-            "location": "[resourceGroup().location]",
+            "location": "westeurope",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_frontendserver859_name'))]"
             ],
             "tags": {
-                "NicksNetwork-updated": "[resourceGroup().location]"
+                "NicksNetwork-updated": "westeurope"
             },
             "properties": {
                 "hardwareProfile": {
@@ -306,22 +305,26 @@
                         "createOption": "FromImage",
                         "caching": "ReadWrite",
                         "managedDisk": {
-                            "storageAccountType": "Standard_LRS"
+                            "id": "[resourceId('Microsoft.Compute/disks', concat(parameters('virtualMachines_frontendSERVER_name'), '_OsDisk_1_c6d33243208549028193e578673837b9'))]"
                         },
-                        "diskSizeGB": 30
+                        "deleteOption": "Detach"
                     },
                     "dataDisks": []
                 },
                 "osProfile": {
                     "computerName": "[parameters('virtualMachines_frontendSERVER_name')]",
                     "adminUsername": "nickadmin",
-                    "adminPassword": "mM%Vc!562yTj",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": false,
-                        "provisionVMAgent": true
+                        "provisionVMAgent": true,
+                        "patchSettings": {
+                            "patchMode": "ImageDefault",
+                            "assessmentMode": "ImageDefault"
+                        }
                     },
                     "secrets": [],
-                    "allowExtensionOperations": true
+                    "allowExtensionOperations": true,
+                    "requireGuestProvisionSignal": true
                 },
                 "networkProfile": {
                     "networkInterfaces": [
@@ -334,7 +337,7 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups/securityRules",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2020-11-01",
             "name": "[concat(parameters('networkSecurityGroups_frontendSERVER_nsg_name'), '/HTTP')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_frontendSERVER_nsg_name'))]"
@@ -356,7 +359,7 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups/securityRules",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2020-11-01",
             "name": "[concat(parameters('networkSecurityGroups_frontendSERVER_nsg_name'), '/HTTPS')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_frontendSERVER_nsg_name'))]"
@@ -378,7 +381,7 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups/securityRules",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2020-11-01",
             "name": "[concat(parameters('networkSecurityGroups_backendSERVER_nsg_name'), '/RDP')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_backendSERVER_nsg_name'))]"
@@ -400,7 +403,29 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups/securityRules",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2020-11-01",
+            "name": "[concat(parameters('networkSecurityGroups_frontendSERVER_nsg_name'), '/RDP')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_frontendSERVER_nsg_name'))]"
+            ],
+            "properties": {
+                "protocol": "TCP",
+                "sourcePortRange": "*",
+                "destinationPortRange": "3389",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 350,
+                "direction": "Inbound",
+                "sourcePortRanges": [],
+                "destinationPortRanges": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+            "apiVersion": "2020-11-01",
             "name": "[concat(parameters('networkSecurityGroups_frontendSERVER_nsg_name'), '/SSH')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_frontendSERVER_nsg_name'))]"
@@ -422,7 +447,7 @@
         },
         {
             "type": "Microsoft.Network/virtualNetworks/subnets",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2020-11-01",
             "name": "[concat(parameters('virtualNetworks_NickSite_vnet_name'), '/default')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_NickSite_vnet_name'))]"
@@ -436,16 +461,16 @@
         },
         {
             "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2020-11-01",
             "name": "[parameters('networkInterfaces_backendserver889_name')]",
-            "location": "[resourceGroup().location]",
+            "location": "westeurope",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_backendSERVER_ip_name'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_NickSite_vnet_name'), 'default')]",
                 "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_backendSERVER_nsg_name'))]"
             ],
             "tags": {
-                "NicksNetwork": "[resourceGroup().location]"
+                "NicksNetwork": "westeurope"
             },
             "properties": {
                 "ipConfigurations": [
@@ -477,16 +502,16 @@
         },
         {
             "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2020-11-01",
             "name": "[parameters('networkInterfaces_frontendserver859_name')]",
-            "location": "[resourceGroup().location]",
+            "location": "westeurope",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_frontendSERVER_ip_name'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_NickSite_vnet_name'), 'default')]",
                 "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_frontendSERVER_nsg_name'))]"
             ],
             "tags": {
-                "NicksNetwork-updated": "[resourceGroup().location]"
+                "NicksNetwork-updated": "westeurope"
             },
             "properties": {
                 "ipConfigurations": [
