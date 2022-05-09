@@ -1,0 +1,102 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualMachines_netsecfw01_name": {
+            "defaultValue": "netsecfw01",
+            "type": "String"
+        },
+        "disks_netsecfw01_OsDisk_1_98eddfaf76df4f52944fa1b12ad8fc28_externalid": {
+            "defaultValue": "/subscriptions/e11e6f4a-db1f-4f2c-a703-264333f8cfc4/resourceGroups/PA-RG01/providers/Microsoft.Compute/disks/netsecfw01_OsDisk_1_98eddfaf76df4f52944fa1b12ad8fc28",
+            "type": "String"
+        },
+        "networkInterfaces_netsecfw01_netsecfw01_eth0_externalid": {
+            "defaultValue": "/subscriptions/e11e6f4a-db1f-4f2c-a703-264333f8cfc4/resourceGroups/PA-RG01/providers/Microsoft.Network/networkInterfaces/netsecfw01-netsecfw01-eth0",
+            "type": "String"
+        },
+        "networkInterfaces_netsecfw01_netsecfw01_eth1_externalid": {
+            "defaultValue": "/subscriptions/e11e6f4a-db1f-4f2c-a703-264333f8cfc4/resourceGroups/PA-RG01/providers/Microsoft.Network/networkInterfaces/netsecfw01-netsecfw01-eth1",
+            "type": "String"
+        },
+        "networkInterfaces_netsecfw01_netsecfw01_eth2_externalid": {
+            "defaultValue": "/subscriptions/e11e6f4a-db1f-4f2c-a703-264333f8cfc4/resourceGroups/PA-RG01/providers/Microsoft.Network/networkInterfaces/netsecfw01-netsecfw01-eth2",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2021-11-01",
+            "name": "[parameters('virtualMachines_netsecfw01_name')]",
+            "location": "westeurope",
+            "plan": {
+                "name": "bundle1",
+                "product": "vmseries-flex",
+                "publisher": "paloaltonetworks"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_D3_v2"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "paloaltonetworks",
+                        "offer": "vmseries-flex",
+                        "sku": "bundle1",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "osType": "Linux",
+                        "name": "[concat(parameters('virtualMachines_netsecfw01_name'), '_OsDisk_1_98eddfaf76df4f52944fa1b12ad8fc28')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "storageAccountType": "Standard_LRS",
+                            "id": "[parameters('disks_netsecfw01_OsDisk_1_98eddfaf76df4f52944fa1b12ad8fc28_externalid')]"
+                        },
+                        "deleteOption": "Detach",
+                        "diskSizeGB": 60
+                    },
+                    "dataDisks": []
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachines_netsecfw01_name')]",
+                    "adminUsername": "admin01",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": false,
+                        "provisionVMAgent": true,
+                        "patchSettings": {
+                            "patchMode": "ImageDefault",
+                            "assessmentMode": "ImageDefault"
+                        }
+                    },
+                    "secrets": [],
+                    "allowExtensionOperations": true
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[parameters('networkInterfaces_netsecfw01_netsecfw01_eth0_externalid')]",
+                            "properties": {
+                                "primary": true
+                            }
+                        },
+                        {
+                            "id": "[parameters('networkInterfaces_netsecfw01_netsecfw01_eth1_externalid')]",
+                            "properties": {
+                                "primary": false
+                            }
+                        },
+                        {
+                            "id": "[parameters('networkInterfaces_netsecfw01_netsecfw01_eth2_externalid')]",
+                            "properties": {
+                                "primary": false
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
