@@ -1,6 +1,6 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.1",
+    "contentVersion": "1.0.0.2",
     "parameters": {
         "virtualNetworks_fwVNET_name": {
             "defaultValue": "fwVNET",
@@ -420,7 +420,7 @@
                     "computerName": "[parameters('virtualMachines_netsecfw1_name')]",
                     "adminUsername": "admin01",
                     "linuxConfiguration": {
-                        "disablePasswordAuthentication": false,
+                        "disablePasswordAuthentication": true,
                         "provisionVMAgent": true,
                         "patchSettings": {
                             "patchMode": "ImageDefault",
