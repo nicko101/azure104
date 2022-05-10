@@ -419,7 +419,6 @@
                 "osProfile": {
                     "computerName": "[parameters('virtualMachines_netsecfw1_name')]",
                     "adminUsername": "admin01",
-                    "adminPassword": "Password123!",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": false,
                         "provisionVMAgent": true,
@@ -428,7 +427,7 @@
                             "assessmentMode": "ImageDefault"
                         }
                     },
-                    "secrets": [],
+                    "secrets": ["Password123!"],
                     "allowExtensionOperations": true
                 },
                 "networkProfile": {
