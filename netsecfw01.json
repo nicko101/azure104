@@ -427,7 +427,7 @@
                             "assessmentMode": "ImageDefault"
                         }
                     },
-                    "secrets": ["Password123!"],
+                    "secrets": [],
                     "allowExtensionOperations": true
                 },
                 "networkProfile": {
