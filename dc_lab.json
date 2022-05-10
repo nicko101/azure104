@@ -45,8 +45,7 @@
                         "createOption": "FromImage",
                         "caching": "ReadWrite",
                         "managedDisk": {
-                            "storageAccountType": "Premium_LRS",
-                            "id": "[parameters('disks_DC01_OsDisk_1_9e4bbd7ef75e4353833b831a438725a0_externalid')]"
+                            "storageAccountType": "Premium_LRS"
                         },
                         "deleteOption": "Delete",
                         "diskSizeGB": 127
