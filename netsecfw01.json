@@ -410,7 +410,6 @@
                         "caching": "ReadWrite",
                         "managedDisk": {
                             "storageAccountType": "Standard_LRS",
-                            "id": "[resourceId('Microsoft.Compute/disks', concat(parameters('virtualMachines_netsecfw1_name'), '_OsDisk_1_5f79ec700a2848fdb84c6566a76470cd'))]"
                         },
                         "deleteOption": "Detach",
                         "diskSizeGB": 60
