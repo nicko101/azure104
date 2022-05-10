@@ -418,9 +418,9 @@
                 },
                 "osProfile": {
                     "computerName": "[parameters('virtualMachines_netsecfw1_name')]",
-                    "adminUsername": "admin01",
+                    "adminUsername": "admin01", "Password123!",
                     "linuxConfiguration": {
-                        "disablePasswordAuthentication": true,
+                        "disablePasswordAuthentication": false,
                         "provisionVMAgent": true,
                         "patchSettings": {
                             "patchMode": "ImageDefault",
