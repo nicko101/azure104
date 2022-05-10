@@ -73,7 +73,7 @@
                         {
                             "id": "[parameters('networkInterfaces_dc01212_z1_externalid')]",
                             "properties": {
-                                "deleteOption": "null"
+                                "deleteOption": "delete"
                             }
                         }
                     ]
