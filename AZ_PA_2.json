@@ -448,7 +448,7 @@
                         "createOption": "FromImage",
                         "caching": "ReadWrite",
                         "managedDisk": {
-                            "storageAccountType": "Standard_LRS",  
+                            "storageAccountType": "Standard_LRS"
                         },
                         "deleteOption": "Detach",
                         "diskSizeGB": 60
@@ -458,7 +458,7 @@
                 "osProfile": {
                     "computerName": "[parameters('virtualMachines_labfirewall01_name')]",
                     "adminUsername": "admin01",
-                    "adminPassword":"Password123!",
+                    "adminPassword": "Password123!",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": false,
                         "provisionVMAgent": true,
