@@ -6,7 +6,7 @@
             "defaultValue": "table",
             "type": "String"
         },
-        "virtualMachines_win10_name":
+        "virtualMachines_win10_name": {
             "defaultValue": "win10",
             "type": "String"
         },
@@ -292,8 +292,7 @@
                         "name": "[concat(parameters('virtualMachines_win10_name'), '_disk1_fd19c8d355574295ba2966982cc2d0ea')]",
                         "createOption": "FromImage",
                         "caching": "ReadWrite",
-                        "managedDisk": {
-                        },
+                        "managedDisk": {},
                         "deleteOption": "Delete"
                     },
                     "dataDisks": [],
@@ -1036,8 +1035,7 @@
                         "name": "[concat(parameters('virtualMachines_nfazfw24_name'), '_OsDisk_1_69221ce3e332425f95ac955fe837754b')]",
                         "createOption": "FromImage",
                         "caching": "ReadWrite",
-                        "managedDisk": {
-                        },
+                        "managedDisk": {},
                         "deleteOption": "Detach"
                     },
                     "dataDisks": []
