@@ -6,7 +6,7 @@
             "defaultValue": "table",
             "type": "String"
         },
-        "virtualMachines_win10_name": {
+        "virtualMachines_win10_name":
             "defaultValue": "win10",
             "type": "String"
         },
@@ -302,7 +302,6 @@
                 "osProfile": {
                     "computerName": "[parameters('virtualMachines_win10_name')]",
                     "adminUsername": "admin01",
-                    "adminPassword": "Password123!",
                     "windowsConfiguration": {
                         "provisionVMAgent": true,
                         "enableAutomaticUpdates": true,
