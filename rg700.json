@@ -302,7 +302,7 @@
                 "osProfile": {
                     "computerName": "[parameters('virtualMachines_win10_name')]",
                     "adminUsername": "admin01",
-                    "adminPassword": "Password123!"
+                    "adminPassword": "Password123!",
                     "windowsConfiguration": {
                         "provisionVMAgent": true,
                         "enableAutomaticUpdates": true,
@@ -1046,6 +1046,7 @@
                 "osProfile": {
                     "computerName": "[parameters('virtualMachines_nfazfw24_name')]",
                     "adminUsername": "admin01",
+                    "adminPassword": "Password123!",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": false,
                         "provisionVMAgent": true,
