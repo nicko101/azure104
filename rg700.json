@@ -293,7 +293,7 @@
                         "createOption": "FromImage",
                         "caching": "ReadWrite",
                         "managedDisk": {
-                            "id": "[resourceId('Microsoft.Compute/disks', concat(parameters('virtualMachines_win10_name'), '_disk1_fd19c8d355574295ba2966982cc2d0ea'))]"
+                            "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('virtualMachines_win10_name'), '_disk1_fd19c8d355574295ba2966982cc2d0ea'))]"
                         },
                         "deleteOption": "Delete"
                     },
@@ -1038,7 +1038,7 @@
                         "createOption": "FromImage",
                         "caching": "ReadWrite",
                         "managedDisk": {
-                            "id": "[resourceId('Microsoft.Compute/disks', concat(parameters('virtualMachines_nfazfw24_name'), '_OsDisk_1_69221ce3e332425f95ac955fe837754b'))]"
+                            "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('virtualMachines_nfazfw24_name'), '_OsDisk_1_69221ce3e332425f95ac955fe837754b'))]"
                         },
                         "deleteOption": "Detach"
                     },
