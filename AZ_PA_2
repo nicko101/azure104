@@ -458,6 +458,7 @@
                 "osProfile": {
                     "computerName": "[parameters('virtualMachines_labfirewall01_name')]",
                     "adminUsername": "admin01",
+                    "adminPassword":"Password123!",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": false,
                         "provisionVMAgent": true,
