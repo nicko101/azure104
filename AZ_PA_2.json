@@ -182,7 +182,7 @@
                         "properties": {
                             "provisioningState": "Succeeded",
                             "privateIPAddress": "10.0.2.4",
-               n             "privateIPAllocationMethod": "Dynamic",
+                            "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
                                 "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_fwVNET_name'), 'Trust')]"
                             },
