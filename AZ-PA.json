@@ -318,8 +318,7 @@
                         "createOption": "FromImage",
                         "caching": "ReadWrite",
                         "managedDisk": {
-                            "id": "[resourceId('Microsoft.Compute/disks', concat(parameters('virtualMachines_CPPM01_name'), '_OsDisk_1_5aa716e5645b49b490711913f3457d16'))]"
-                        },
+                       
                         "deleteOption": "Delete"
                     },
                     "dataDisks": []
@@ -327,6 +326,7 @@
                 "osProfile": {
                     "computerName": "[parameters('virtualMachines_CPPM01_name')]",
                     "adminUsername": "admin01",
+                    "adminPassword":"Password123!",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": false,
                         "provisionVMAgent": true,
@@ -392,6 +392,7 @@
                 "osProfile": {
                     "computerName": "[parameters('virtualMachines_Server16_name')]",
                     "adminUsername": "admin01",
+                    "adminPassword":"Password123!",
                     "windowsConfiguration": {
                         "provisionVMAgent": true,
                         "enableAutomaticUpdates": true,
@@ -1172,7 +1173,7 @@
                         "caching": "ReadWrite",
                         "managedDisk": {
                             "storageAccountType": "Standard_LRS",
-                            "id": "[resourceId('Microsoft.Compute/disks', concat(parameters('virtualMachines_nfazfw24_name'), '_OsDisk_1_69221ce3e332425f95ac955fe837754b'))]"
+                            
                         },
                         "deleteOption": "Detach",
                         "diskSizeGB": 60
@@ -1182,6 +1183,7 @@
                 "osProfile": {
                     "computerName": "[parameters('virtualMachines_nfazfw24_name')]",
                     "adminUsername": "admin01",
+                    "adminPassword":"Password123!",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": false,
                         "provisionVMAgent": true,
