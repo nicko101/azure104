@@ -352,7 +352,7 @@
                 }
             }
         },
-        {
+        
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2023-03-01",
             "name": "[parameters('virtualMachines_Server16_name')]",
@@ -1172,7 +1172,7 @@
                         "createOption": "FromImage",
                         "caching": "ReadWrite",
                         "managedDisk": {
-                            "storageAccountType": "Standard_LRS",
+                            "storageAccountType": "Standard_LRS"
                             
                         },
                         "deleteOption": "Detach",
