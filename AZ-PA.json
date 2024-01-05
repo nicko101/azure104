@@ -423,10 +423,10 @@
                         }
                     ]
                 },
-                "licenseType": "Windows_Server"
-            }
-        },
-        {
+                "licenseType": "Windows_Server",
+                
+        
+        
             "type": "microsoft.devtestlab/schedules",
             "apiVersion": "2018-09-15",
             "name": "[parameters('schedules_shutdown_computevm_server16_name')]",
@@ -450,7 +450,7 @@
                 "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_Server16_name'))]"
             }
         },
-        {
+        
             "type": "Microsoft.Network/bastionHosts",
             "apiVersion": "2023-06-01",
             "name": "[parameters('bastionHosts_fwVNET_bastion_name')]",
@@ -470,7 +470,7 @@
                 "ipConfigurations": []
             }
         },
-        {
+        
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2023-06-01",
             "name": "[parameters('networkInterfaces_nfazfw24_nfazfw24_eth2_name')]",
