@@ -1,6 +1,6 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.",
+    "contentVersion": "1.0.0.0",
     "parameters": {
         "virtualMachines_CPPM01_name": {
             "defaultValue": "CPPM01",
@@ -139,6 +139,7 @@
                         "createOption": "FromImage",
                         "caching": "ReadWrite",
                         "managedDisk": {
+                            "id": "[resourceId('Microsoft.Compute/disks', concat(parameters('virtualMachines_CPPM01_name'), '_OsDisk_1_a17d62bb5fb5430d83d02666feccb459'))]"
                         },
                         "deleteOption": "Detach"
                     },
@@ -147,7 +148,6 @@
                 "osProfile": {
                     "computerName": "[parameters('virtualMachines_CPPM01_name')]",
                     "adminUsername": "admin01",
-                    "adminPassword": "Password123!",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": false,
                         "provisionVMAgent": true,
@@ -158,7 +158,8 @@
                         "enableVMAgentPlatformUpdates": false
                     },
                     "secrets": [],
-                    "allowExtensionOperations": true
+                    "allowExtensionOperations": true,
+                    "requireGuestProvisionSignal": true
                 },
                 "networkProfile": {
                     "networkInterfaces": [
