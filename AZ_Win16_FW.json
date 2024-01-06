@@ -633,7 +633,6 @@
                         "createOption": "FromImage",
                         "caching": "ReadWrite",
                         "managedDisk": {
-                            "id": "[resourceId('Microsoft.Compute/disks', concat(parameters('virtualMachines_labfirewall01_name'), '_OsDisk_1_f3a502233c0e46ddacee020ff318bb48'))]"
                         },
                         "deleteOption": "Detach"
                     },
