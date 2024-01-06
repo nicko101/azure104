@@ -158,8 +158,7 @@
                         "enableVMAgentPlatformUpdates": false
                     },
                     "secrets": [],
-                    "allowExtensionOperations": true,
-                    "requireGuestProvisionSignal": False
+                    "allowExtensionOperations": true
                 },
                 "networkProfile": {
                     "networkInterfaces": [
