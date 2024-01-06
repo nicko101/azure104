@@ -201,7 +201,7 @@
                         "createOption": "FromImage",
                         "caching": "ReadWrite",
                         "managedDisk": {
-                            "id": "[resourceId('Microsoft.Compute/disks', concat(parameters('virtualMachines_WinServer16_name'), '_OsDisk_1_c6d437b1f46744d0bed4c5988fd04313'))]"
+                            "id": "[resourceId('Microsoft.Compute/disks/', concat(parameters('virtualMachines_WinServer16_name'), '_OsDisk_1_c6d437b1f46744d0bed4c5988fd04313'))]"
                         },
                         "deleteOption": "Detach"
                     },
@@ -633,7 +633,6 @@
                         "createOption": "FromImage",
                         "caching": "ReadWrite",
                         "managedDisk": {
-                            "id": "[resourceId('Microsoft.Compute/disks', concat(parameters('virtualMachines_labfirewall01_name'), '_OsDisk_1_f3a502233c0e46ddacee020ff318bb48'))]"
                         },
                         "deleteOption": "Detach"
                     },
