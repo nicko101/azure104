@@ -1,0 +1,683 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualNetworks_fwVNET_name": {
+            "defaultValue": "fwVNET",
+            "type": "String"
+        },
+        "publicIPAddresses_lab01_name": {
+            "defaultValue": "lab01",
+            "type": "String"
+        },
+        "virtualMachines_WinServer16_name": {
+            "defaultValue": "WinServer16",
+            "type": "String"
+        },
+        "publicIPAddresses_fwVNET_ip_name": {
+            "defaultValue": "fwVNET-ip",
+            "type": "String"
+        },
+        "virtualMachines_labfirewall01_name": {
+            "defaultValue": "labfirewall01",
+            "type": "String"
+        },
+        "networkInterfaces_winserver16973_name": {
+            "defaultValue": "winserver16973",
+            "type": "String"
+        },
+        "networkSecurityGroups_DefaultNSG_name": {
+            "defaultValue": "DefaultNSG",
+            "type": "String"
+        },
+        "publicIPAddresses_WinServer16_ip_name": {
+            "defaultValue": "WinServer16-ip",
+            "type": "String"
+        },
+        "networkInterfaces_labfirewall01_lab01_eth0_name": {
+            "defaultValue": "labfirewall01-lab01-eth0",
+            "type": "String"
+        },
+        "networkInterfaces_labfirewall01_lab01_eth1_name": {
+            "defaultValue": "labfirewall01-lab01-eth1",
+            "type": "String"
+        },
+        "networkInterfaces_labfirewall01_lab01_eth2_name": {
+            "defaultValue": "labfirewall01-lab01-eth2",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2023-06-01",
+            "name": "[parameters('networkSecurityGroups_DefaultNSG_name')]",
+            "location": "northeurope",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Allow-Outside-From-IP",
+                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups/securityRules', parameters('networkSecurityGroups_DefaultNSG_name'), 'Allow-Outside-From-IP')]",
+                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                        "properties": {
+                            "description": "Rule",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "0.0.0.0/0",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "Allow-Intra",
+                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups/securityRules', parameters('networkSecurityGroups_DefaultNSG_name'), 'Allow-Intra')]",
+                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                        "properties": {
+                            "description": "Allow intra network traffic",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "10.0.0.0/16",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 101,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "Default-Deny",
+                        "id": "[resourceId('Microsoft.Network/networkSecurityGroups/securityRules', parameters('networkSecurityGroups_DefaultNSG_name'), 'Default-Deny')]",
+                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                        "properties": {
+                            "description": "Default-Deny if we don't match Allow rule",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Deny",
+                            "priority": 200,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2023-06-01",
+            "name": "[parameters('publicIPAddresses_fwVNET_ip_name')]",
+            "location": "northeurope",
+            "sku": {
+                "name": "Standard",
+                "tier": "Regional"
+            },
+            "properties": {
+                "ipAddress": "20.107.219.93",
+                "publicIPAddressVersion": "IPv4",
+                "publicIPAllocationMethod": "Static",
+                "idleTimeoutInMinutes": 4,
+                "ipTags": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2023-06-01",
+            "name": "[parameters('publicIPAddresses_lab01_name')]",
+            "location": "northeurope",
+            "sku": {
+                "name": "Basic",
+                "tier": "Regional"
+            },
+            "properties": {
+                "publicIPAddressVersion": "IPv4",
+                "publicIPAllocationMethod": "Dynamic",
+                "idleTimeoutInMinutes": 4,
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('publicIPAddresses_lab01_name')]",
+                    "fqdn": "[concat(parameters('publicIPAddresses_lab01_name'), '.northeurope.cloudapp.azure.com')]"
+                },
+                "ipTags": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2023-06-01",
+            "name": "[parameters('publicIPAddresses_WinServer16_ip_name')]",
+            "location": "northeurope",
+            "sku": {
+                "name": "Standard",
+                "tier": "Regional"
+            },
+            "properties": {
+                "ipAddress": "74.234.98.246",
+                "publicIPAddressVersion": "IPv4",
+                "publicIPAllocationMethod": "Static",
+                "idleTimeoutInMinutes": 4,
+                "ipTags": []
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2023-03-01",
+            "name": "[parameters('virtualMachines_WinServer16_name')]",
+            "location": "northeurope",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_winserver16973_name'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_DS1_v2"
+                },
+                "additionalCapabilities": {
+                    "hibernationEnabled": false
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2016-datacenter-gensecond",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "osType": "Windows",
+                        "name": "[concat(parameters('virtualMachines_WinServer16_name'), '_OsDisk_1_c6d437b1f46744d0bed4c5988fd04313')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "id": "[resourceId('Microsoft.Compute/disks', concat(parameters('virtualMachines_WinServer16_name'), '_OsDisk_1_c6d437b1f46744d0bed4c5988fd04313'))]"
+                        },
+                        "deleteOption": "Detach"
+                    },
+                    "dataDisks": [],
+                    "diskControllerType": "SCSI"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachines_WinServer16_name')]",
+                    "adminUsername": "admin01",
+                    "windowsConfiguration": {
+                        "provisionVMAgent": true,
+                        "enableAutomaticUpdates": true,
+                        "patchSettings": {
+                            "patchMode": "AutomaticByOS",
+                            "assessmentMode": "ImageDefault",
+                            "enableHotpatching": false
+                        },
+                        "enableVMAgentPlatformUpdates": false
+                    },
+                    "secrets": [],
+                    "allowExtensionOperations": true,
+                    "requireGuestProvisionSignal": true
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_winserver16973_name'))]",
+                            "properties": {
+                                "deleteOption": "Detach"
+                            }
+                        }
+                    ]
+                },
+                "licenseType": "Windows_Server"
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2023-06-01",
+            "name": "[parameters('networkInterfaces_labfirewall01_lab01_eth1_name')]",
+            "location": "northeurope",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_fwVNET_name'), 'Untrust')]"
+            ],
+            "kind": "Regular",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig-untrust",
+                        "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_labfirewall01_lab01_eth1_name')), '/ipConfigurations/ipconfig-untrust')]",
+                        "etag": "W/\"2bb6c8b8-0363-4af1-bdf4-2186a56dc2c2\"",
+                        "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "privateIPAddress": "10.0.1.4",
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_fwVNET_name'), 'Untrust')]"
+                            },
+                            "primary": true,
+                            "privateIPAddressVersion": "IPv4"
+                        }
+                    }
+                ],
+                "dnsSettings": {
+                    "dnsServers": []
+                },
+                "enableAcceleratedNetworking": true,
+                "enableIPForwarding": true,
+                "disableTcpStateTracking": false,
+                "nicType": "Standard",
+                "auxiliaryMode": "None",
+                "auxiliarySku": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2023-06-01",
+            "name": "[parameters('networkInterfaces_labfirewall01_lab01_eth2_name')]",
+            "location": "northeurope",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_fwVNET_name'), 'Trust')]"
+            ],
+            "kind": "Regular",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig-trust",
+                        "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_labfirewall01_lab01_eth2_name')), '/ipConfigurations/ipconfig-trust')]",
+                        "etag": "W/\"1394bd42-c836-4d26-b73f-cde2085fe41b\"",
+                        "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "privateIPAddress": "10.0.2.4",
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_fwVNET_name'), 'Trust')]"
+                            },
+                            "primary": true,
+                            "privateIPAddressVersion": "IPv4"
+                        }
+                    }
+                ],
+                "dnsSettings": {
+                    "dnsServers": []
+                },
+                "enableAcceleratedNetworking": true,
+                "enableIPForwarding": true,
+                "disableTcpStateTracking": false,
+                "nicType": "Standard",
+                "auxiliaryMode": "None",
+                "auxiliarySku": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+            "apiVersion": "2023-06-01",
+            "name": "[concat(parameters('networkSecurityGroups_DefaultNSG_name'), '/Allow-Intra')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_DefaultNSG_name'))]"
+            ],
+            "properties": {
+                "description": "Allow intra network traffic",
+                "protocol": "*",
+                "sourcePortRange": "*",
+                "destinationPortRange": "*",
+                "sourceAddressPrefix": "10.0.0.0/16",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 101,
+                "direction": "Inbound",
+                "sourcePortRanges": [],
+                "destinationPortRanges": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+            "apiVersion": "2023-06-01",
+            "name": "[concat(parameters('networkSecurityGroups_DefaultNSG_name'), '/Allow-Outside-From-IP')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_DefaultNSG_name'))]"
+            ],
+            "properties": {
+                "description": "Rule",
+                "protocol": "*",
+                "sourcePortRange": "*",
+                "destinationPortRange": "*",
+                "sourceAddressPrefix": "0.0.0.0/0",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 100,
+                "direction": "Inbound",
+                "sourcePortRanges": [],
+                "destinationPortRanges": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+            "apiVersion": "2023-06-01",
+            "name": "[concat(parameters('networkSecurityGroups_DefaultNSG_name'), '/Default-Deny')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_DefaultNSG_name'))]"
+            ],
+            "properties": {
+                "description": "Default-Deny if we don't match Allow rule",
+                "protocol": "*",
+                "sourcePortRange": "*",
+                "destinationPortRange": "*",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "*",
+                "access": "Deny",
+                "priority": 200,
+                "direction": "Inbound",
+                "sourcePortRanges": [],
+                "destinationPortRanges": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2023-06-01",
+            "name": "[parameters('virtualNetworks_fwVNET_name')]",
+            "location": "northeurope",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_DefaultNSG_name'))]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.0.0.0/16"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "Mgmt",
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_fwVNET_name'), 'Mgmt')]",
+                        "properties": {
+                            "addressPrefix": "10.0.0.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_DefaultNSG_name'))]"
+                            },
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Disabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        },
+                        "type": "Microsoft.Network/virtualNetworks/subnets"
+                    },
+                    {
+                        "name": "Untrust",
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_fwVNET_name'), 'Untrust')]",
+                        "properties": {
+                            "addressPrefix": "10.0.1.0/24",
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Disabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        },
+                        "type": "Microsoft.Network/virtualNetworks/subnets"
+                    },
+                    {
+                        "name": "Trust",
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_fwVNET_name'), 'Trust')]",
+                        "properties": {
+                            "addressPrefix": "10.0.2.0/24",
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Disabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        },
+                        "type": "Microsoft.Network/virtualNetworks/subnets"
+                    },
+                    {
+                        "name": "AzureBastionSubnet",
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_fwVNET_name'), 'AzureBastionSubnet')]",
+                        "properties": {
+                            "addressPrefix": "10.0.3.0/26",
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Disabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        },
+                        "type": "Microsoft.Network/virtualNetworks/subnets"
+                    }
+                ],
+                "virtualNetworkPeerings": [],
+                "enableDdosProtection": false
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2023-06-01",
+            "name": "[concat(parameters('virtualNetworks_fwVNET_name'), '/AzureBastionSubnet')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_fwVNET_name'))]"
+            ],
+            "properties": {
+                "addressPrefix": "10.0.3.0/26",
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2023-06-01",
+            "name": "[concat(parameters('virtualNetworks_fwVNET_name'), '/Trust')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_fwVNET_name'))]"
+            ],
+            "properties": {
+                "addressPrefix": "10.0.2.0/24",
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2023-06-01",
+            "name": "[concat(parameters('virtualNetworks_fwVNET_name'), '/Untrust')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_fwVNET_name'))]"
+            ],
+            "properties": {
+                "addressPrefix": "10.0.1.0/24",
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2023-06-01",
+            "name": "[parameters('networkInterfaces_labfirewall01_lab01_eth0_name')]",
+            "location": "northeurope",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_lab01_name'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_fwVNET_name'), 'Mgmt')]"
+            ],
+            "kind": "Regular",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig-mgmt",
+                        "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_labfirewall01_lab01_eth0_name')), '/ipConfigurations/ipconfig-mgmt')]",
+                        "etag": "W/\"5c5fa9db-8033-4905-8890-4e7c3a1b0326\"",
+                        "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "privateIPAddress": "10.0.0.4",
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_lab01_name'))]"
+                            },
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_fwVNET_name'), 'Mgmt')]"
+                            },
+                            "primary": true,
+                            "privateIPAddressVersion": "IPv4"
+                        }
+                    }
+                ],
+                "dnsSettings": {
+                    "dnsServers": []
+                },
+                "enableAcceleratedNetworking": false,
+                "enableIPForwarding": false,
+                "disableTcpStateTracking": false,
+                "nicType": "Standard",
+                "auxiliaryMode": "None",
+                "auxiliarySku": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2023-06-01",
+            "name": "[parameters('networkInterfaces_winserver16973_name')]",
+            "location": "northeurope",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_WinServer16_ip_name'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_fwVNET_name'), 'Trust')]"
+            ],
+            "kind": "Regular",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_winserver16973_name')), '/ipConfigurations/ipconfig1')]",
+                        "etag": "W/\"64fa80f4-f468-4ce5-98ad-7b2408e766e2\"",
+                        "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "privateIPAddress": "10.0.2.5",
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_WinServer16_ip_name'))]",
+                                "properties": {
+                                    "deleteOption": "Detach"
+                                }
+                            },
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_fwVNET_name'), 'Trust')]"
+                            },
+                            "primary": true,
+                            "privateIPAddressVersion": "IPv4"
+                        }
+                    }
+                ],
+                "dnsSettings": {
+                    "dnsServers": []
+                },
+                "enableAcceleratedNetworking": true,
+                "enableIPForwarding": false,
+                "disableTcpStateTracking": false,
+                "nicType": "Standard",
+                "auxiliaryMode": "None",
+                "auxiliarySku": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2023-06-01",
+            "name": "[concat(parameters('virtualNetworks_fwVNET_name'), '/Mgmt')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_fwVNET_name'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_DefaultNSG_name'))]"
+            ],
+            "properties": {
+                "addressPrefix": "10.0.0.0/24",
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_DefaultNSG_name'))]"
+                },
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2023-03-01",
+            "name": "[parameters('virtualMachines_labfirewall01_name')]",
+            "location": "northeurope",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_labfirewall01_lab01_eth0_name'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_labfirewall01_lab01_eth1_name'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_labfirewall01_lab01_eth2_name'))]"
+            ],
+            "plan": {
+                "name": "bundle1",
+                "product": "vmseries-flex",
+                "publisher": "paloaltonetworks"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_D3_v2"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "paloaltonetworks",
+                        "offer": "vmseries-flex",
+                        "sku": "bundle1",
+                        "version": "10.1.0"
+                    },
+                    "osDisk": {
+                        "osType": "Linux",
+                        "name": "[concat(parameters('virtualMachines_labfirewall01_name'), '_OsDisk_1_f3a502233c0e46ddacee020ff318bb48')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "id": "[resourceId('Microsoft.Compute/disks', concat(parameters('virtualMachines_labfirewall01_name'), '_OsDisk_1_f3a502233c0e46ddacee020ff318bb48'))]"
+                        },
+                        "deleteOption": "Detach"
+                    },
+                    "dataDisks": []
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachines_labfirewall01_name')]",
+                    "adminUsername": "admin01",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": false,
+                        "provisionVMAgent": true,
+                        "patchSettings": {
+                            "patchMode": "ImageDefault",
+                            "assessmentMode": "ImageDefault"
+                        },
+                        "enableVMAgentPlatformUpdates": false
+                    },
+                    "secrets": [],
+                    "allowExtensionOperations": true,
+                    "requireGuestProvisionSignal": true
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_labfirewall01_lab01_eth0_name'))]",
+                            "properties": {
+                                "primary": true
+                            }
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_labfirewall01_lab01_eth1_name'))]",
+                            "properties": {
+                                "primary": false
+                            }
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_labfirewall01_lab01_eth2_name'))]",
+                            "properties": {
+                                "primary": false
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
