@@ -1,6 +1,6 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
+    "contentVersion": "1.0.0.1",
     "parameters": {
         "virtualNetworks_fwVNET_name": {
             "defaultValue": "fwVNET",
@@ -201,7 +201,6 @@
                         "createOption": "FromImage",
                         "caching": "ReadWrite",
                         "managedDisk": {
-                            "id": "[resourceId('Microsoft.Compute/disks', concat(parameters('virtualMachines_WinServer16_name'), '_OsDisk_1_c6d437b1f46744d0bed4c5988fd04313'))]"
                         },
                         "deleteOption": "Detach"
                     },
@@ -211,6 +210,7 @@
                 "osProfile": {
                     "computerName": "[parameters('virtualMachines_WinServer16_name')]",
                     "adminUsername": "admin01",
+                    "adminPassword":"Password123!",
                     "windowsConfiguration": {
                         "provisionVMAgent": true,
                         "enableAutomaticUpdates": true,
