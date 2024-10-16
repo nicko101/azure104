@@ -1,0 +1,308 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "routeTables_HUB_name": {
+            "defaultValue": "HUB",
+            "type": "String"
+        },
+        "connections_AZ_HOME_name": {
+            "defaultValue": "AZ-HOME",
+            "type": "String"
+        },
+        "routeTables_VPN_GW_RT_name": {
+            "defaultValue": "VPN_GW_RT",
+            "type": "String"
+        },
+        "virtualNetworks_NF_NET_name": {
+            "defaultValue": "NF_NET",
+            "type": "String"
+        },
+        "localNetworkGateways_LVPNGW_name": {
+            "defaultValue": "LVPNGW",
+            "type": "String"
+        },
+        "publicIPAddresses_NF_VPN_PIP_name": {
+            "defaultValue": "NF_VPN_PIP",
+            "type": "String"
+        },
+        "virtualNetworkGateways_NF_VPN_name": {
+            "defaultValue": "NF_VPN",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Network/localNetworkGateways",
+            "apiVersion": "2024-01-01",
+            "name": "[parameters('localNetworkGateways_LVPNGW_name')]",
+            "location": "northeurope",
+            "properties": {
+                "localNetworkAddressSpace": {
+                    "addressPrefixes": [
+                        "192.168.0.0/24"
+                    ]
+                },
+                "gatewayIpAddress": "37.228.232.195"
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2024-01-01",
+            "name": "[parameters('publicIPAddresses_NF_VPN_PIP_name')]",
+            "location": "northeurope",
+            "sku": {
+                "name": "Standard",
+                "tier": "Regional"
+            },
+            "properties": {
+                "ipAddress": "40.85.132.1",
+                "publicIPAddressVersion": "IPv4",
+                "publicIPAllocationMethod": "Static",
+                "idleTimeoutInMinutes": 4,
+                "ipTags": [],
+                "ddosSettings": {
+                    "protectionMode": "VirtualNetworkInherited"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2024-01-01",
+            "name": "[parameters('routeTables_HUB_name')]",
+            "location": "northeurope",
+            "properties": {
+                "disableBgpRoutePropagation": false,
+                "routes": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2024-01-01",
+            "name": "[parameters('routeTables_VPN_GW_RT_name')]",
+            "location": "northeurope",
+            "properties": {
+                "disableBgpRoutePropagation": false,
+                "routes": [
+                    {
+                        "name": "To-HOME",
+                        "id": "[resourceId('Microsoft.Network/routeTables/routes', parameters('routeTables_VPN_GW_RT_name'), 'To-HOME')]",
+                        "properties": {
+                            "addressPrefix": "192.168.0.0/24",
+                            "nextHopType": "VirtualNetworkGateway",
+                            "hasBgpOverride": false
+                        },
+                        "type": "Microsoft.Network/routeTables/routes"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/routeTables/routes",
+            "apiVersion": "2024-01-01",
+            "name": "[concat(parameters('routeTables_VPN_GW_RT_name'), '/To-HOME')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/routeTables', parameters('routeTables_VPN_GW_RT_name'))]"
+            ],
+            "properties": {
+                "addressPrefix": "192.168.0.0/24",
+                "nextHopType": "VirtualNetworkGateway",
+                "hasBgpOverride": false
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2024-01-01",
+            "name": "[parameters('virtualNetworks_NF_NET_name')]",
+            "location": "northeurope",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/routeTables', parameters('routeTables_VPN_GW_RT_name'))]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.1.0.0/16"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "default",
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_NF_NET_name'), 'default')]",
+                        "properties": {
+                            "addressPrefix": "10.1.0.0/24",
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Disabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        },
+                        "type": "Microsoft.Network/virtualNetworks/subnets"
+                    },
+                    {
+                        "name": "GatewaySubnet",
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_NF_NET_name'), 'GatewaySubnet')]",
+                        "properties": {
+                            "addressPrefix": "10.1.1.0/24",
+                            "routeTable": {
+                                "id": "[resourceId('Microsoft.Network/routeTables', parameters('routeTables_VPN_GW_RT_name'))]"
+                            },
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Disabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        },
+                        "type": "Microsoft.Network/virtualNetworks/subnets"
+                    }
+                ],
+                "virtualNetworkPeerings": [],
+                "enableDdosProtection": false
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2024-01-01",
+            "name": "[concat(parameters('virtualNetworks_NF_NET_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_NF_NET_name'))]"
+            ],
+            "properties": {
+                "addressPrefix": "10.1.0.0/24",
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Network/connections",
+            "apiVersion": "2024-01-01",
+            "name": "[parameters('connections_AZ_HOME_name')]",
+            "location": "northeurope",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworkGateways', parameters('virtualNetworkGateways_NF_VPN_name'))]",
+                "[resourceId('Microsoft.Network/localNetworkGateways', parameters('localNetworkGateways_LVPNGW_name'))]"
+            ],
+            "properties": {
+                "virtualNetworkGateway1": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', parameters('virtualNetworkGateways_NF_VPN_name'))]",
+                    "properties": {}
+                },
+                "localNetworkGateway2": {
+                    "id": "[resourceId('Microsoft.Network/localNetworkGateways', parameters('localNetworkGateways_LVPNGW_name'))]",
+                    "properties": {}
+                },
+                "connectionType": "IPsec",
+                "connectionProtocol": "IKEv2",
+                "routingWeight": 0,
+                "enableBgp": false,
+                "useLocalAzureIpAddress": false,
+                "usePolicyBasedTrafficSelectors": false,
+                "ipsecPolicies": [],
+                "trafficSelectorPolicies": [],
+                "expressRouteGatewayBypass": false,
+                "enablePrivateLinkFastPath": false,
+                "dpdTimeoutSeconds": 45,
+                "connectionMode": "Default",
+                "gatewayCustomBgpIpAddresses": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "apiVersion": "2024-01-01",
+            "name": "[parameters('virtualNetworkGateways_NF_VPN_name')]",
+            "location": "northeurope",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_NF_VPN_PIP_name'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_NF_NET_name'), 'GatewaySubnet')]"
+            ],
+            "properties": {
+                "enablePrivateIpAddress": false,
+                "ipConfigurations": [
+                    {
+                        "name": "default",
+                        "id": "[concat(resourceId('Microsoft.Network/virtualNetworkGateways', parameters('virtualNetworkGateways_NF_VPN_name')), '/ipConfigurations/default')]",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_NF_VPN_PIP_name'))]"
+                            },
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_NF_NET_name'), 'GatewaySubnet')]"
+                            }
+                        }
+                    }
+                ],
+                "natRules": [],
+                "virtualNetworkGatewayPolicyGroups": [],
+                "enableBgpRouteTranslationForNat": false,
+                "disableIPSecReplayProtection": false,
+                "sku": {
+                    "name": "VpnGw1",
+                    "tier": "VpnGw1"
+                },
+                "gatewayType": "Vpn",
+                "vpnType": "RouteBased",
+                "enableBgp": false,
+                "activeActive": false,
+                "vpnClientConfiguration": {
+                    "vpnClientAddressPool": {
+                        "addressPrefixes": [
+                            "10.222.0.0/16"
+                        ]
+                    },
+                    "vpnClientProtocols": [
+                        "OpenVPN"
+                    ],
+                    "vpnAuthenticationTypes": [
+                        "Certificate"
+                    ],
+                    "vpnClientRootCertificates": [
+                        {
+                            "name": "RootCA",
+                            "id": "[concat(resourceId('Microsoft.Network/virtualNetworkGateways', parameters('virtualNetworkGateways_NF_VPN_name')), '/vpnClientRootCertificates/RootCA')]",
+                            "properties": {
+                                "publicCertData": "MIIDZzCCAk+gAwIBAgIQUG0Mkiamj5NC+WfJtyp8LDANBgkqhkiG9w0BAQsFADBG MRUwEwYKCZImiZPyLGQBGRYFbG9jYWwxFTATBgoJkiaJk/IsZAEZFgVsYWIwMTEW MBQGA1UEAxMNbGFiMDEtREMwMS1DQTAeFw0yMzA1MjExMDA0NTVaFw0yODA1MjEx MDE0NTVaMEYxFTATBgoJkiaJk/IsZAEZFgVsb2NhbDEVMBMGCgmSJomT8ixkARkW BWxhYjAxMRYwFAYDVQQDEw1sYWIwMS1EQzAxLUNBMIIBIjANBgkqhkiG9w0BAQEF AAOCAQ8AMIIBCgKCAQEA0VW19iD67Fw+yL0K8uwlvGuVK27jVCFeoUpYRTKzC6O+ ii+5NNrHdxuNfqx7ajtaokMVkTvT9+8fqlmcSsARpncuufM9t2eWYKjIoRaT0njs /gwDGKexCQJDD1Fz5bEYAYsgZivCDmJ9Y7j0ERWfBFzRUtmmskBLd7UOBBjQTnVK e2Keou8ETp1o496ZFfUOX3qTrIS1vVNQiud6A4cBRiY3ypdGZQ/FDVS8aSszuo2I 0Y5zZ0AInP9JKfIEqccIEfB97qRPwNqp5+nuqR4kcYCjAOaIeXmz8MI1U5DDQmbN xDgRlOJj69I7MoVLX2iYMNWJ5Z2GIHAoXJxtSagClQIDAQABo1EwTzALBgNVHQ8E BAMCAYYwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUWG9xLsNnpcORWD/L8gMp akLbSFIwEAYJKwYBBAGCNxUBBAMCAQAwDQYJKoZIhvcNAQELBQADggEBAKP4PUNu djm7bSV+IOtgMc5T6P82ZgydXmLKdsrt8IZMjE1AF28cWxMfdQZy4THiqU6l3S+6 dMwvZaQyashQQL0sDreEIXF/HRuWquQ+6zNhIoJ71+e51QhjEawoMkFelR9shDO9 DwSWLTHGer722GAt0tUJN9MRuyx5YZdmtRZySt+cRHomDzjgvw7DTXvZ3udNmsIk rGSzxev5HjlrA76kc276+2pXAQZVAl3jOwdW6UZEp1LARnMW77KTikqaNEpN6mxG u4tGGJhhtDV1ctgDO1QbIUAP0CkEsQuBmnrEloNRwq6it1UuZjZWpjteb2L5yjEB ux4eBn6cJ8n3F6c="
+                            }
+                        }
+                    ],
+                    "vpnClientRevokedCertificates": [],
+                    "vngClientConnectionConfigurations": [],
+                    "radiusServers": [],
+                    "vpnClientIpsecPolicies": []
+                },
+                "bgpSettings": {
+                    "asn": 65515,
+                    "bgpPeeringAddress": "10.1.1.254",
+                    "peerWeight": 0,
+                    "bgpPeeringAddresses": [
+                        {
+                            "ipconfigurationId": "[concat(resourceId('Microsoft.Network/virtualNetworkGateways', parameters('virtualNetworkGateways_NF_VPN_name')), '/ipConfigurations/default')]",
+                            "customBgpIpAddresses": []
+                        }
+                    ]
+                },
+                "customRoutes": {
+                    "addressPrefixes": []
+                },
+                "vpnGatewayGeneration": "Generation1",
+                "allowRemoteVnetTraffic": false,
+                "allowVirtualWanTraffic": false
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2024-01-01",
+            "name": "[concat(parameters('virtualNetworks_NF_NET_name'), '/GatewaySubnet')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_NF_NET_name'))]",
+                "[resourceId('Microsoft.Network/routeTables', parameters('routeTables_VPN_GW_RT_name'))]"
+            ],
+            "properties": {
+                "addressPrefix": "10.1.1.0/24",
+                "routeTable": {
+                    "id": "[resourceId('Microsoft.Network/routeTables', parameters('routeTables_VPN_GW_RT_name'))]"
+                },
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+        }
+    ]
+}
